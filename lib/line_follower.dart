@@ -6,33 +6,22 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class LineFollower extends StatefulWidget {
   static const String id = "line_follower";
-
   @override
   State<LineFollower> createState() => _LineFollowerState();
 }
-
 class _LineFollowerState extends State<LineFollower> {
-  String mode = 'ST';  // Default to stop mode
+  String mode = 'ST';
   bool isManualModeActive = false;
   bool isLineFollowerModeActive = false;
   bool isObstacleAvoidanceModeActive = false;
-
-  // WebSocket URL to send commands
-  String serverUrl = 'ws://192.168.4.1:81';  // Update with your server's WebSocket URL
-
-  WebSocketChannel? channel;  // WebSocket channel
-
+  String serverUrl = 'ws://192.168.4.1:81';
+  WebSocketChannel? channel;
   @override
   void initState() {
     super.initState();
-    // Lock orientation to portrait when this page is loaded
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-    // Connect to the WebSocket server when the page is loaded
     channel = WebSocketChannel.connect(Uri.parse(serverUrl));
   }
-
-  // Send command through WebSocket
   void sendCommand(String command) {
     if (channel != null) {
       channel!.sink.add(command);
@@ -41,7 +30,6 @@ class _LineFollowerState extends State<LineFollower> {
       print('Error: WebSocket not connected');
     }
   }
-
   void toggleMode(String selectedMode) {
     setState(() {
       mode = selectedMode;
@@ -49,41 +37,31 @@ class _LineFollowerState extends State<LineFollower> {
       isLineFollowerModeActive = selectedMode == 'l';
       isObstacleAvoidanceModeActive = selectedMode == 'o';
     });
-
-    sendCommand(selectedMode);  // Send the selected mode command to ESP8266
+    sendCommand(selectedMode);
   }
-
-  bool isRunning = false; // State variable for START/STOP
-
-  // Toggle START/STOP
+  bool isRunning = false;
   void _toggleStartStop() {
     setState(() {
-      isRunning = !isRunning; // Toggle state
+      isRunning = !isRunning;
 
       if (isRunning) {
-        // Send Line Follower Mode Command
-        sendCommand('l');  // 'l' for Line Follower Mode
+        sendCommand('l');
       } else {
-        // Send STOP Command
-        sendCommand('ST');  // 'ST' for Stop Mode
+        sendCommand('ST');
       }
     });
   }
-
   @override
   void dispose() {
-    // Close the WebSocket connection when the page is disposed
     channel?.sink.close();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Image
           Image.asset(
             'images/background_image.jpeg',
             fit: BoxFit.cover,
@@ -93,7 +71,6 @@ class _LineFollowerState extends State<LineFollower> {
               children: [
                 Column(
                   children: [
-                    // Top Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -136,7 +113,6 @@ class _LineFollowerState extends State<LineFollower> {
                         ),
                       ],
                     ),
-                    // Card Below First Row
                     Card(
                       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       shape: RoundedRectangleBorder(
@@ -148,13 +124,12 @@ class _LineFollowerState extends State<LineFollower> {
                         tag: 'line_follower',
                         child: Image.asset(
                           'images/line_follower.jpeg',
-                          fit: BoxFit.cover, // Adjust the fit to cover the available space
-                          height: 580,  // Set a fixed height for the image
-                          width: double.infinity,  // Make it fill the width
+                          fit: BoxFit.cover,
+                          height: 580,
+                          width: double.infinity,
                         ),
                       ),
                     ),
-                    // Rounded Button BELOW the Card
                     RoundedButton1(
                       colors: isRunning ? Colors.red : Colors.green,
                       text_color: Colors.white,
@@ -172,7 +147,6 @@ class _LineFollowerState extends State<LineFollower> {
       ),
     );
   }
-
   Widget _buildTopCard({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -184,7 +158,6 @@ class _LineFollowerState extends State<LineFollower> {
       ),
     );
   }
-
   Widget _buildTopCard1({required Widget child}) {
     return Card(
       color: Colors.black54,

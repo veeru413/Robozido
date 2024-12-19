@@ -9,43 +9,29 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Modes extends StatefulWidget {
   static const String id = "modes";
-
-
   @override
   State<Modes> createState() => _ModesState();
 }
-
 class _ModesState extends State<Modes> {
-  WebSocketChannel? channel;  // WebSocket channel
+  WebSocketChannel? channel;
   int _clickCount = 0;
-  String mode = 'ST';  // Default to stop mode
+  String mode = 'ST';
   bool isManualModeActive = false;
   bool isLineFollowerModeActive = false;
   bool isObstacleAvoidanceModeActive = false;
-
-  // Server URL (change to your NodeMCU IP address and port if needed)
-  String serverUrl = 'ws://192.168.4.1:81';  // WebSocket server URL
-
+  String serverUrl = 'ws://192.168.4.1:81';
   @override
   void initState() {
     super.initState();
-    // Lock orientation to portrait when this page is loaded
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    // Connect to WebSocket
     channel = WebSocketChannel.connect(Uri.parse(serverUrl));
-
   }
-  // Function to send mode change command to ESP8266
-  // Function to send mode change command to ESP8266
   Future<void> sendCommand(String command) async {
     if (channel != null) {
-      // Send command via WebSocket
       channel?.sink.add(command);
       print('Command sent: $command');
-
-      // You can also listen for a response from the server (if needed)
       channel?.stream.listen((response) {
         print('Received from server: $response');
       });
@@ -53,7 +39,6 @@ class _ModesState extends State<Modes> {
       print('WebSocket channel is not connected');
     }
   }
-
   void toggleMode(String selectedMode) {
     setState(() {
       mode = selectedMode;
@@ -61,26 +46,23 @@ class _ModesState extends State<Modes> {
       isLineFollowerModeActive = selectedMode == 'l';
       isObstacleAvoidanceModeActive = selectedMode == 'o';
     });
-
-    sendCommand(selectedMode);  // Send the selected mode command to ESP8266
+    sendCommand(selectedMode);
   }
   void _resetClickCount() {
     setState(() {
-      _clickCount = 0; // Reset the count to zero
+      _clickCount = 0;
     });
   }
-
   void _onModesTextClicked() {
     setState(() {
       _clickCount++;
     });
     if (_clickCount >= 10) {
-      // Navigate to the Easter egg page when clicked 10 times
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => EasterEggPage(
-            resetClickCount: _resetClickCount, // Pass the reset callback
+            resetClickCount: _resetClickCount,
           ),
         ),
       );
@@ -88,12 +70,9 @@ class _ModesState extends State<Modes> {
   }
   @override
   void dispose() {
-    channel?.sink.close();  // Close WebSocket when the page is disposed
+    channel?.sink.close();
     super.dispose();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,12 +80,10 @@ class _ModesState extends State<Modes> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Image
           Image.asset(
             'images/background_image.jpeg',
             fit: BoxFit.cover,
           ),
-          // SafeArea to keep content in safe boundary
           SafeArea(
             child: Column(
               children: [
@@ -126,7 +103,7 @@ class _ModesState extends State<Modes> {
                     ),
                     _buildTopCard(
                       child: GestureDetector(
-                        onTap: _onModesTextClicked, // Handle tap on MODES text
+                        onTap: _onModesTextClicked,
                         child: Padding(
                           padding: EdgeInsets.only(left: 45, right: 45),
                           child: Text(
@@ -163,7 +140,6 @@ class _ModesState extends State<Modes> {
                   ],
                 ),
                 const SizedBox(height: 5),
-                // Bottom Cards 4, 5, 6
                 Expanded(
                   child: ListView(
                     children: [
@@ -176,25 +152,23 @@ class _ModesState extends State<Modes> {
                               sendCommand('m');
                               Navigator.pushNamed(context, Manual.id);
                             },
-                            heroTag: 'manual', // Added Hero tag for Manual Mode
+                            heroTag: 'manual',
                           ),
                           DiagonalCard(
                             imagePath: 'images/obs_avoiding.jpeg',
                             text: 'Obstacle Avoider',
                             onTap: () {
-                              //toggleMode('o');
                               Navigator.pushNamed(context, ObsAvoider.id);
                             },
-                            heroTag: 'obstacle', // Added Hero tag for Obstacle Avoider
+                            heroTag: 'obstacle',
                           ),
                           DiagonalCard(
                             imagePath: 'images/line_follower.jpeg',
                             text: 'Line Follower',
                             onTap: () {
-                              //toggleMode('l');
                               Navigator.pushNamed(context, LineFollower.id);
                             },
-                            heroTag: 'line_follower', // Added Hero tag for Line Follower
+                            heroTag: 'line_follower',
                           ),
                         ],
                       ),
@@ -208,7 +182,6 @@ class _ModesState extends State<Modes> {
       ),
     );
   }
-
   Widget _buildTopCard({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -220,7 +193,6 @@ class _ModesState extends State<Modes> {
       ),
     );
   }
-
   Widget _buildTopCard1({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -232,10 +204,7 @@ class _ModesState extends State<Modes> {
       ),
     );
   }
-
-// Bottom Cards 4, 5, 6 (Diagonal Split Cards)
 }
-
 void _showConfirmationDialog1(BuildContext context) {
   showDialog(
     context: context,
@@ -296,7 +265,6 @@ void _showConfirmationDialog1(BuildContext context) {
                           Navigator.pop(context);
                         },
                         text_color: Colors.white,
-                        // Close the dialog
                       ),
                     )
                   ],
@@ -312,7 +280,6 @@ void _showConfirmationDialog1(BuildContext context) {
 class EasterEggPage extends StatelessWidget {
   final VoidCallback resetClickCount;
 
-  // Constructor to accept the reset callback
   const EasterEggPage({Key? key, required this.resetClickCount}) : super(key: key);
 
   @override
@@ -321,12 +288,10 @@ class EasterEggPage extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Image
           Image.asset(
             'images/background_image.jpeg',
             fit: BoxFit.cover,
           ),
-          // Center content with a Card
           Center(
             child: Card(
               color: Colors.black.withOpacity(0.8),
@@ -339,10 +304,9 @@ class EasterEggPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Easter Egg Heading in Cursive
                     AnimatedDefaultTextStyle(
                       style: TextStyle(
-                        fontFamily: 'Cursive', // Cursive font style
+                        fontFamily: 'Cursive',
                         fontSize: 40.0,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -352,23 +316,21 @@ class EasterEggPage extends StatelessWidget {
                       child: Text('EASTER EGG🥚'),
                     ),
                     SizedBox(height: 20),
-                    // Updated Introductory Message
                     Text(
                       'Hey, there! 🌟\n\nI’m Veerendra, the sole creator of this app, and congratulations on finding the Easter egg! 🙌\n\nYour discovery truly reflects the passion and love you have for this app, and it fills me with joy. 💛\n\nJust keep loving ROBOCELL and this app, and with that, it’s me signing off. 🚀\n\n#ROBOCELL27 Created with love ~ 20th Dec 2024 ✨',
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
-                        fontFamily: 'Roboto', // Plain font for the text body
+                        fontFamily: 'Roboto',
                         fontWeight: FontWeight.normal,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 20),
-                    // Go back button
                     ElevatedButton(
                       onPressed: () {
-                        resetClickCount(); // Reset the count when going back
+                        resetClickCount();
                         Navigator.pop(context);
                       },
                       child: Text("Go Back", style: TextStyle(fontSize: 18.0)),
@@ -390,16 +352,11 @@ class EasterEggPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
 class DiagonalCard extends StatelessWidget {
-  final String imagePath; // Background Image
-  final String text; // Card Text
-  final VoidCallback onTap; // Button Functionality
-  final String heroTag; // Hero tag for each image
-
+  final String imagePath;
+  final String text;
+  final VoidCallback onTap;
+  final String heroTag;
   const DiagonalCard({
     Key? key,
     required this.imagePath,
@@ -407,7 +364,6 @@ class DiagonalCard extends StatelessWidget {
     required this.onTap,
     required this.heroTag,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -418,23 +374,21 @@ class DiagonalCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           image: DecorationImage(
-            image: AssetImage(imagePath), // Full image as background
+            image: AssetImage(imagePath),
             fit: BoxFit.cover,
           ),
         ),
         child: Stack(
           children: [
-            // Diagonal Opaque Overlay
             ClipPath(
               clipper: DiagonalClipper(),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5), // Opaque color
+                  color: Colors.black.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
-            // Hero Widget for animation
             Hero(
               tag: heroTag,
               child: Container(
@@ -461,19 +415,16 @@ class DiagonalCard extends StatelessWidget {
     );
   }
 }
-
-// Custom Clipper for Diagonal Design
 class DiagonalClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.lineTo(0, size.height); // Bottom-left
-    path.lineTo(size.width, size.height * 0.75); // Bottom-right diagonal point
-    path.lineTo(size.width, 0); // Top-right
-    path.close(); // Back to Top-left
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, size.height * 0.75);
+    path.lineTo(size.width, 0);
+    path.close();
     return path;
   }
-
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

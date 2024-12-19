@@ -6,55 +6,42 @@ import 'Rounded_Buttons.dart';
 
 class Manual extends StatefulWidget {
   static const String id = "manual";
-
   @override
   State<Manual> createState() => _ManualState();
 }
-
 class _ManualState extends State<Manual> {
-  String serverUrl = 'ws://192.168.4.1:81'; // WebSocket URL
-  WebSocketChannel? channel; // WebSocket channel instance
+  String serverUrl = 'ws://192.168.4.1:81';
+  WebSocketChannel? channel;
   String mode = 'ST';
   bool isForward = false;
   bool isBackward = false;
   bool isLeft = false;
   bool isRight = false;
-
   @override
   void initState() {
     super.initState();
-    // Lock orientation to landscape when this page is loaded
     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-
-    // Connect to WebSocket server
     channel = WebSocketChannel.connect(Uri.parse(serverUrl));
   }
-
   @override
   void dispose() {
-    // Reset orientation settings when leaving this page
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     channel?.sink.close();
     super.dispose();
   }
-
-  double servoAngle = 90.0; // Default angle for servo
+  double servoAngle = 90.0;
   String directionLeft = "None";
   String directionRight = "None";
-
   Offset _leftJoystickPosition = Offset(0, 0);
   Offset _rightJoystickPosition = Offset(0, 0);
   @override
   Widget build(BuildContext context) {
-    // Force landscape mode
     WidgetsFlutterBinding.ensureInitialized();
-
     return Scaffold(
       body: SafeArea(
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background Image
             Image.asset(
               'images/background_image.jpeg',
               fit: BoxFit.fitWidth,
@@ -62,7 +49,6 @@ class _ManualState extends State<Manual> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top Header Row
                 SizedBox(height: 5,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,7 +88,6 @@ class _ManualState extends State<Manual> {
                 Expanded(
                   child: Row(
                     children: [
-                      // Left Control Joystick
                       Expanded(
                         child: _buildJoystick(
                           label: "LEFT JOYSTICK",
@@ -110,12 +95,11 @@ class _ManualState extends State<Manual> {
                           isVertical: true,
                           onDragUpdate: (offset) {
                             setState(() {
-                              _leftJoystickPosition = Offset(0, offset.dy); // Restrict to vertical
+                              _leftJoystickPosition = Offset(0, offset.dy);
                               directionLeft = _getDirection(_leftJoystickPosition, true);
-                              sendCommand(directionLeft); // Send the direction command to NodeMCU
+                              sendCommand(directionLeft);
                             });
                           },
-
                           onDragEnd: () {
                             setState(() {
                               directionLeft = "None";
@@ -125,9 +109,7 @@ class _ManualState extends State<Manual> {
                           },
                         ),
                       ),
-                      // Servo Angle Control
                       _buildServoControl(),
-                      // Right Control Joystick
                       Expanded(
                         child: _buildJoystick(
                           label: "RIGHT JOYSTICK",
@@ -135,9 +117,8 @@ class _ManualState extends State<Manual> {
                           isVertical: false,
                           onDragUpdate: (offset) {
                             setState(() {
-                              _rightJoystickPosition = Offset(offset.dx, 0); // Restrict to horizontal
+                              _rightJoystickPosition = Offset(offset.dx, 0);
                               directionRight = _getDirection(_rightJoystickPosition, false);
-                              // NodeMCU code here: sendRightDirection(directionRight);
                               toggleMode(directionRight);
                             });
                           },
@@ -160,22 +141,18 @@ class _ManualState extends State<Manual> {
       ),
     );
   }
-  // Send command via WebSocket
   void sendCommand(String command) {
     if (channel != null) {
       channel?.sink.add(command);
       print('Command sent: $command');
     }
   }
-
-  // Handle servo slider changes
   void sendServoAngle(double angle) {
     if (channel != null) {
       channel?.sink.add('Servo:$angle');
       print('Servo angle set to: $angle');
     }
   }
-
   void toggleMode(String selectedMode) {
     setState(() {
       mode = selectedMode;
@@ -184,10 +161,8 @@ class _ManualState extends State<Manual> {
       isLeft = selectedMode == 'Left';
       isRight = selectedMode == 'Right';
     });
-
-    sendCommand(selectedMode);  // Send the selected mode command to NodeMCU
+    sendCommand(selectedMode);
   }
-
   void _showConfirmationDialog1(BuildContext context) {
     showDialog(
       context: context,
@@ -263,7 +238,6 @@ class _ManualState extends State<Manual> {
       },
     );
   }
-
   Widget _buildServoControl() {
     return SizedBox(
       width: 250,
@@ -271,7 +245,6 @@ class _ManualState extends State<Manual> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Servo Angle Display
             Card(
               color: Colors.black54,
               shape: RoundedRectangleBorder(
@@ -290,7 +263,6 @@ class _ManualState extends State<Manual> {
               ),
             ),
             SizedBox(height: 20),
-            // Servo Slider
             Card(
               color: Colors.black87,
               shape: RoundedRectangleBorder(
@@ -318,11 +290,10 @@ class _ManualState extends State<Manual> {
                       onChanged: (value) {
                         setState(() {
                           servoAngle = value;
-                          sendServoAngle(servoAngle); // Send the servo angle to NodeMCU
+                          sendServoAngle(servoAngle);
                         });
                       },
                     )
-
                   ],
                 ),
               ),
@@ -332,7 +303,6 @@ class _ManualState extends State<Manual> {
       ),
     );
   }
-
   Widget _buildJoystick({
     required String label,
     required String direction,
@@ -353,7 +323,6 @@ class _ManualState extends State<Manual> {
         Stack(
           alignment: Alignment.center,
           children: [
-            // Joystick Background
             Container(
               height: 200,
               width: 200,
@@ -369,7 +338,6 @@ class _ManualState extends State<Manual> {
                 ],
               ),
             ),
-            // Direction Indicator
             Positioned(
               top: isVertical ? 0 : 85,
               bottom: isVertical ? 0 : 85,
@@ -420,7 +388,6 @@ class _ManualState extends State<Manual> {
       ],
     );
   }
-
   String _getDirection(Offset offset, bool isVertical) {
     if (isVertical) {
       if (offset.dy < -20) {
@@ -437,7 +404,6 @@ class _ManualState extends State<Manual> {
     }
     return "None";
   }
-
   Widget _buildTopCard({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -449,7 +415,6 @@ class _ManualState extends State<Manual> {
       ),
     );
   }
-
   Widget _buildTopCard1({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -462,25 +427,20 @@ class _ManualState extends State<Manual> {
     );
   }
 }
-
 class JoystickPainter extends CustomPainter {
   final Offset offset;
-
   JoystickPainter({required this.offset});
-
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = Colors.yellow
       ..strokeWidth = 6;
-
     canvas.drawCircle(
       Offset(size.width / 2 + offset.dx, size.height / 2 + offset.dy),
       20,
       paint,
     );
   }
-
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;

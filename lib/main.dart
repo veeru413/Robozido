@@ -5,13 +5,11 @@ import 'package:robozido/line_follower.dart';
 import 'package:robozido/manual.dart';
 import 'package:robozido/modes.dart';
 import 'package:robozido/obs_avoider.dart';
-
 import 'Rounded_Buttons.dart';
 
 void main() {
   runApp(RoboCellApp());
 }
-
 class RoboCellApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -27,35 +25,29 @@ class RoboCellApp extends StatelessWidget {
     );
   }
 }
-
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
-  bool _popupDisplayed = false; // Tracks if the pop-up has been shown
+  bool _popupDisplayed = false;
 
   @override
   void initState() {
     super.initState();
-    // Lock orientation to portrait when this page is loaded
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
   }
-
   static const colorizeColors = [
     Colors.white,
     Colors.black,
     Colors.grey,
   ];
-
   static const colorizeTextStyle = TextStyle(
     fontSize: 35.0,
     fontWeight: FontWeight.w900,
   );
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,16 +56,13 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            // Background Image
             Image.asset(
               'images/background_image.jpeg',
               fit: BoxFit.cover,
             ),
-            // Main Content
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Club Logo
                 Hero(
                   tag: 'logo',
                   child: SizedBox(

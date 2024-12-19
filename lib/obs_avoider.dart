@@ -6,28 +6,19 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ObsAvoider extends StatefulWidget {
   static const String id = "obs_avoider";
-
   @override
   State<ObsAvoider> createState() => _ObsAvoiderState();
 }
-
 class _ObsAvoiderState extends State<ObsAvoider> {
-  String serverUrl = 'ws://192.168.4.1:81';  // WebSocket URL
-
-  WebSocketChannel? channel;  // WebSocket channel
-
+  String serverUrl = 'ws://192.168.4.1:81';
+  WebSocketChannel? channel;
   @override
   void initState() {
     super.initState();
-    // Lock orientation to portrait when this page is loaded
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // Connect to the WebSocket server when the page is loaded
     channel = WebSocketChannel.connect(Uri.parse(serverUrl));
   }
-
-  bool isRunning = false; // State variable for START/STOP
-
-  // Send command through WebSocket
+  bool isRunning = false;
   void sendCommand(String command) {
     if (channel != null) {
       channel!.sink.add(command);
@@ -36,36 +27,27 @@ class _ObsAvoiderState extends State<ObsAvoider> {
       print('Error: WebSocket not connected');
     }
   }
-
-  // Toggle START/STOP
   void _toggleStartStop() {
     setState(() {
-      isRunning = !isRunning; // Toggle state
-
+      isRunning = !isRunning;
       if (isRunning) {
-        // Send command to start obstacle avoidance mode
-        sendCommand('o');  // 'o' for Obstacle Avoidance Mode
+        sendCommand('o');
       } else {
-        // Send STOP command
-        sendCommand('ST');  // 'ST' for Stop Mode
+        sendCommand('ST');
       }
     });
   }
-
   @override
   void dispose() {
-    // Close the WebSocket connection when the page is disposed
     channel?.sink.close();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Image
           Image.asset(
             'images/background_image.jpeg',
             fit: BoxFit.cover,
@@ -118,7 +100,6 @@ class _ObsAvoiderState extends State<ObsAvoider> {
                         ),
                       ],
                     ),
-                    // Card Below First Row
                     Card(
                       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       shape: RoundedRectangleBorder(
@@ -130,13 +111,12 @@ class _ObsAvoiderState extends State<ObsAvoider> {
                         tag: 'obstacle',
                         child: Image.asset(
                           'images/obs_avoiding.jpeg',
-                          fit: BoxFit.cover, // Adjust the fit to cover the available space
-                          height: 580,  // Set a fixed height for the image
-                          width: double.infinity,  // Make it fill the width
+                          fit: BoxFit.cover,
+                          height: 580,
+                          width: double.infinity,
                         ),
                       ),
                     ),
-                    // Rounded Button BELOW the Card
                     RoundedButton1(
                       colors: isRunning ? Colors.red : Colors.green,
                       text_color: Colors.white,
@@ -154,7 +134,6 @@ class _ObsAvoiderState extends State<ObsAvoider> {
       ),
     );
   }
-
   Widget _buildTopCard({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -166,7 +145,6 @@ class _ObsAvoiderState extends State<ObsAvoider> {
       ),
     );
   }
-
   Widget _buildTopCard1({required Widget child}) {
     return Card(
       color: Colors.black54,
