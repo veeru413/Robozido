@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Rounded_Buttons.dart';
+import 'package:flutter/services.dart';
+
 
 class Manual extends StatefulWidget {
   static const String id = "manual";
@@ -38,106 +40,106 @@ class _ManualState extends State<Manual> {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'images/background_image.jpeg',
-              fit: BoxFit.fitWidth,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 5,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'images/background_image.jpeg',
+            fit: BoxFit.fitWidth,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 5,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildTopCard1(
+                    child: Hero(
+                      tag: 'logo',
+                      child: SizedBox(
+                        height: 50,
+                        child: Image.asset('images/logo.png'),
+                      ),
+                    ),
+                  ),
+                  _buildTopCard(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 100),
+                      child: Text(
+                        "MANUAL CONTROL",
+                        style: GoogleFonts.electrolize(
+                          fontSize: 28.0,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _buildTopCard1(
+                    child: IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.yellow),
+                      onPressed: () {
+                        _showConfirmationDialog1(context);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Row(
                   children: [
-                    _buildTopCard1(
-                      child: Hero(
-                        tag: 'logo',
-                        child: SizedBox(
-                          height: 50,
-                          child: Image.asset('images/logo.png'),
-                        ),
+                    Expanded(
+                      child: _buildJoystick(
+                        label: "LEFT JOYSTICK",
+                        direction: directionLeft,
+                        isVertical: true,
+                        onDragUpdate: (offset) {
+                          setState(() {
+                            HapticFeedback.vibrate();
+                            _leftJoystickPosition = Offset(0, offset.dy);
+                            directionLeft = _getDirection(_leftJoystickPosition, true);
+                            sendCommand(directionLeft);
+                          });
+                        },
+                        onDragEnd: () {
+                          setState(() {
+                            directionLeft = "None";
+                            _leftJoystickPosition = Offset.zero;
+                          });
+                          sendCommand('ST');
+                        },
                       ),
                     ),
-                    _buildTopCard(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 100),
-                        child: Text(
-                          "MANUAL CONTROL",
-                          style: GoogleFonts.electrolize(
-                            fontSize: 28.0,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    _buildTopCard1(
-                      child: IconButton(
-                        icon: const Icon(Icons.logout, color: Colors.yellow),
-                        onPressed: () {
-                          _showConfirmationDialog1(context);
+                    _buildServoControl(),
+                    Expanded(
+                      child: _buildJoystick(
+                        label: "RIGHT JOYSTICK",
+                        direction: directionRight,
+                        isVertical: false,
+                        onDragUpdate: (offset) {
+                          setState(() {
+                            HapticFeedback.vibrate();
+                            _rightJoystickPosition = Offset(offset.dx, 0);
+                            directionRight = _getDirection(_rightJoystickPosition, false);
+                            toggleMode(directionRight);
+                          });
+                        },
+                        onDragEnd: () {
+                          setState(() {
+                            directionRight = "None";
+                            _rightJoystickPosition = Offset.zero;
+                          });
+                          toggleMode('ST');
                         },
                       ),
                     ),
                   ],
                 ),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildJoystick(
-                          label: "LEFT JOYSTICK",
-                          direction: directionLeft,
-                          isVertical: true,
-                          onDragUpdate: (offset) {
-                            setState(() {
-                              _leftJoystickPosition = Offset(0, offset.dy);
-                              directionLeft = _getDirection(_leftJoystickPosition, true);
-                              sendCommand(directionLeft);
-                            });
-                          },
-                          onDragEnd: () {
-                            setState(() {
-                              directionLeft = "None";
-                              _leftJoystickPosition = Offset.zero;
-                            });
-                            sendCommand('ST');
-                          },
-                        ),
-                      ),
-                      _buildServoControl(),
-                      Expanded(
-                        child: _buildJoystick(
-                          label: "RIGHT JOYSTICK",
-                          direction: directionRight,
-                          isVertical: false,
-                          onDragUpdate: (offset) {
-                            setState(() {
-                              _rightJoystickPosition = Offset(offset.dx, 0);
-                              directionRight = _getDirection(_rightJoystickPosition, false);
-                              toggleMode(directionRight);
-                            });
-                          },
-                          onDragEnd: () {
-                            setState(() {
-                              directionRight = "None";
-                              _rightJoystickPosition = Offset.zero;
-                            });
-                            toggleMode('ST');
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

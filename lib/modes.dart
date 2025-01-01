@@ -9,9 +9,11 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Modes extends StatefulWidget {
   static const String id = "modes";
+
   @override
   State<Modes> createState() => _ModesState();
 }
+
 class _ModesState extends State<Modes> {
   WebSocketChannel? channel;
   int _clickCount = 0;
@@ -20,6 +22,7 @@ class _ModesState extends State<Modes> {
   bool isLineFollowerModeActive = false;
   bool isObstacleAvoidanceModeActive = false;
   String serverUrl = 'ws://192.168.4.1:81';
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +31,7 @@ class _ModesState extends State<Modes> {
     ]);
     channel = WebSocketChannel.connect(Uri.parse(serverUrl));
   }
+
   Future<void> sendCommand(String command) async {
     if (channel != null) {
       channel?.sink.add(command);
@@ -39,6 +43,7 @@ class _ModesState extends State<Modes> {
       print('WebSocket channel is not connected');
     }
   }
+
   void toggleMode(String selectedMode) {
     setState(() {
       mode = selectedMode;
@@ -48,11 +53,13 @@ class _ModesState extends State<Modes> {
     });
     sendCommand(selectedMode);
   }
+
   void _resetClickCount() {
     setState(() {
       _clickCount = 0;
     });
   }
+
   void _onModesTextClicked() {
     setState(() {
       _clickCount++;
@@ -68,6 +75,7 @@ class _ModesState extends State<Modes> {
       );
     }
   }
+
   @override
   void dispose() {
     channel?.sink.close();
@@ -129,7 +137,7 @@ class _ModesState extends State<Modes> {
                           padding: const EdgeInsets.all(6.0),
                           child: IconButton(
                             icon:
-                            const Icon(Icons.logout, color: Colors.yellow),
+                                const Icon(Icons.logout, color: Colors.yellow),
                             onPressed: () {
                               _showConfirmationDialog1(context);
                             },
@@ -149,6 +157,7 @@ class _ModesState extends State<Modes> {
                             imagePath: 'images/manual.jpeg',
                             text: 'Manual Mode',
                             onTap: () {
+                              HapticFeedback.vibrate();
                               sendCommand('m');
                               Navigator.pushNamed(context, Manual.id);
                             },
@@ -158,6 +167,7 @@ class _ModesState extends State<Modes> {
                             imagePath: 'images/obs_avoiding.jpeg',
                             text: 'Obstacle Avoider',
                             onTap: () {
+                              HapticFeedback.vibrate();
                               Navigator.pushNamed(context, ObsAvoider.id);
                             },
                             heroTag: 'obstacle',
@@ -166,6 +176,7 @@ class _ModesState extends State<Modes> {
                             imagePath: 'images/line_follower.jpeg',
                             text: 'Line Follower',
                             onTap: () {
+                              HapticFeedback.vibrate();
                               Navigator.pushNamed(context, LineFollower.id);
                             },
                             heroTag: 'line_follower',
@@ -182,6 +193,7 @@ class _ModesState extends State<Modes> {
       ),
     );
   }
+
   Widget _buildTopCard({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -193,6 +205,7 @@ class _ModesState extends State<Modes> {
       ),
     );
   }
+
   Widget _buildTopCard1({required Widget child}) {
     return Card(
       color: Colors.black54,
@@ -205,6 +218,7 @@ class _ModesState extends State<Modes> {
     );
   }
 }
+
 void _showConfirmationDialog1(BuildContext context) {
   showDialog(
     context: context,
@@ -277,10 +291,12 @@ void _showConfirmationDialog1(BuildContext context) {
     },
   );
 }
+
 class EasterEggPage extends StatelessWidget {
   final VoidCallback resetClickCount;
 
-  const EasterEggPage({Key? key, required this.resetClickCount}) : super(key: key);
+  const EasterEggPage({Key? key, required this.resetClickCount})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +352,8 @@ class EasterEggPage extends StatelessWidget {
                       child: Text("Go Back", style: TextStyle(fontSize: 18.0)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.yellow,
-                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -352,11 +369,13 @@ class EasterEggPage extends StatelessWidget {
     );
   }
 }
+
 class DiagonalCard extends StatelessWidget {
   final String imagePath;
   final String text;
   final VoidCallback onTap;
   final String heroTag;
+
   const DiagonalCard({
     Key? key,
     required this.imagePath,
@@ -364,6 +383,7 @@ class DiagonalCard extends StatelessWidget {
     required this.onTap,
     required this.heroTag,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -415,6 +435,7 @@ class DiagonalCard extends StatelessWidget {
     );
   }
 }
+
 class DiagonalClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -425,6 +446,7 @@ class DiagonalClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

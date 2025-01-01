@@ -42,6 +42,7 @@ class _LineFollowerState extends State<LineFollower> {
   bool isRunning = false;
   void _toggleStartStop() {
     setState(() {
+      HapticFeedback.vibrate();
       isRunning = !isRunning;
 
       if (isRunning) {

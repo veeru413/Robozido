@@ -29,6 +29,7 @@ class _ObsAvoiderState extends State<ObsAvoider> {
   }
   void _toggleStartStop() {
     setState(() {
+      HapticFeedback.vibrate();
       isRunning = !isRunning;
       if (isRunning) {
         sendCommand('o');
